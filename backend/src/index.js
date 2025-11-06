@@ -19,7 +19,11 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "https://notenexuskiet.netlify.app", // your frontend domain
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true, // if you’re using cookies or tokens in headers
+}));
 
 app.get("/", (req, res) => {
   res.send("API running!");
