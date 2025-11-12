@@ -9,6 +9,10 @@ theme: {
       sand: '#f7f2ec',
       cocoa: '#4b3e35',
       tan: '#7b6f63',
+      primary: "#669a9b",
+      secondary: "#8dbbb9",
+      accent: "#b9d6d5",
+      background: "#dcebea",
     },
   }
 }

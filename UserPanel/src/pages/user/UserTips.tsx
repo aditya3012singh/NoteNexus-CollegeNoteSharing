@@ -1,93 +1,90 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Plus,
-  ThumbsUp,
-  MessageCircle,
-  Clock,
-  User,
-  CheckCircle,
   Lightbulb,
-  Star,
-  Award,
-  TrendingUp,
   X,
   Send,
-  Eye,
+  User,
+  CheckCircle,
+  Calendar,
   Heart,
   BookmarkPlus,
-  Filter,
-  Calendar,
-  Zap
-} from 'lucide-react';
-import { Tip } from '../../types';
-import { apiService } from '../../services/api';
-import { toast } from 'react-toastify';
+  Eye,
+  Award,
+  TrendingUp,
+} from "lucide-react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../redux/store";
+import {
+  getAllTips,
+  createTip,
+  clearMessages,
+} from "../../redux/slices/tipSlice";
 
 const UserTips: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newTip, setNewTip] = useState({ title: '', content: '' });
-  const [tips, setTips] = useState<Tip[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchTips();
-  }, []);
-
-  const fetchTips = async () => {
-    try {
-      setLoading(true);
-      const response = await apiService.getAllTips();
-      const approvedTips = (response.tips || []).filter(
-        (tip: { status: string }) => tip.status === 'APPROVED'
-      );
-      setTips(approvedTips);
-    } catch (error) {
-      console.error('Error fetching tips:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredTips = tips.filter(
-    (tip) =>
-      tip.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tip.content.toLowerCase().includes(searchTerm.toLowerCase())
+  const { allTips, loading, error, successMessage } = useSelector(
+    (state: RootState) => state.tips
   );
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newTip, setNewTip] = useState({ title: "", content: "" });
+
+  useEffect(() => {
+    dispatch(getAllTips());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(clearMessages());
+    }
+    if (error) {
+      toast.error(error);
+      dispatch(clearMessages());
+    }
+  }, [successMessage, error, dispatch]);
 
   const handleCreateTip = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const trimmedTitle = newTip.title.trim();
-    const trimmedContent = newTip.content.trim();
+    const title = newTip.title.trim();
+    const content = newTip.content.trim();
 
-    if (trimmedTitle.length < 10 || trimmedContent.length < 10) {
+    if (title.length < 10 || content.length < 10) {
       toast.error("Both title and content must be at least 10 characters long.");
       return;
     }
 
     try {
-      await apiService.createTip(newTip);
-      setNewTip({ title: '', content: '' });
+      await dispatch(createTip({ title, content })).unwrap();
+      setNewTip({ title: "", content: "" });
       setShowCreateForm(false);
-      toast.success('Tip submitted successfully and is pending for approval!');
-      fetchTips();
-    } catch (error) {
-      console.error('Error creating tip:', error);
-      toast.error('Failed to submit tip. Please try again.');
-    }
+      dispatch(getAllTips());
+    } catch {}
   };
+
+  const approvedTips = allTips.filter((tip) => tip.status === "APPROVED");
+  const filteredTips = approvedTips.filter(
+    (tip) =>
+      tip.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tip.content.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-[#dcebea] to-[#b9d6d5]">
+        <div className="bg-white/80 p-8 rounded-2xl shadow-xl border border-[#dcebea]/60">
           <div className="flex flex-col items-center space-y-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 border-t-amber-500"></div>
-            <p className="text-slate-600 font-medium">Loading study tips...</p>
+            <div className="animate-spin h-12 w-12 border-4 border-[#b9d6d5] border-t-[#669a9b] rounded-full"></div>
+            <p className="text-[#669a9b] font-medium">Loading study tips...</p>
           </div>
         </div>
       </div>
@@ -95,86 +92,84 @@ const UserTips: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative">
-      {/* Animated Background Elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 bg-amber-200 rounded-full opacity-30 animate-pulse"></div>
-      <div className="absolute top-40 right-10 w-16 h-16 bg-blue-200 rounded-full opacity-30 animate-pulse delay-1000"></div>
-      <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-purple-200 rounded-full opacity-30 animate-pulse delay-2000"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-[#dcebea] to-[#b9d6d5] relative">
+      {/* Floating shapes */}
+      <div className="absolute top-20 left-10 w-20 h-20 bg-[#8dbbb9]/40 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-10 w-24 h-24 bg-[#b9d6d5]/50 rounded-full blur-2xl"></div>
 
       <div className="relative z-10 space-y-8">
         {/* Header */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20 animate-fade-in">
+        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-[#dcebea]/60">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="mb-6 lg:mb-0">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
-                Study Tips
+              <h1 className="text-4xl font-bold text-slate-800">
+                Study <span className="text-[#669a9b]">Tips</span>
               </h1>
-              <p className="text-xl text-slate-600 leading-relaxed">
-                Share and discover effective study strategies from fellow learners
+              <p className="text-lg text-slate-600 mt-2">
+                Share and discover effective study strategies with{" "}
+                <span className="font-semibold text-[#669a9b]">NoteNexus</span>
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 px-4 py-2 bg-white/50 backdrop-blur-sm rounded-xl border border-white/30">
-                <Lightbulb className="h-5 w-5 text-orange-600" />
-                <span className="text-orange-400 font-semibold">{filteredTips.length} tips available</span>
+              <div className="flex items-center bg-[#dcebea] text-[#669a9b] px-4 py-2 rounded-xl">
+                <Lightbulb className="h-5 w-5 mr-2" />
+                {filteredTips.length} Tips
               </div>
               <button
                 onClick={() => setShowCreateForm(true)}
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-400 to-orange-600 text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#669a9b] to-[#8dbbb9] text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all"
               >
-                <Plus className="h-5 w-5 mr-2" />
-                Share a Tip
+                <Plus className="h-5 w-5 mr-2" /> Share a Tip
               </button>
             </div>
           </div>
         </div>
 
-        {/* Search & Filter Section */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20 animate-slide-up delay-200">
+        {/* Search */}
+        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-[#dcebea]/60">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-900 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 bg-gradient-to-r from-[#669a9b] to-[#8dbbb9] rounded-xl flex items-center justify-center">
               <Search className="h-5 w-5 text-white" />
             </div>
             <h3 className="text-xl font-bold text-slate-800">Find Study Tips</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search Input */}
             <div className="md:col-span-2 relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
               <input
                 type="text"
                 placeholder="Search tips by title or content..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-white/50 backdrop-blur-sm border border-white/30 rounded-xl text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+                className="w-full pl-12 pr-4 py-3 bg-white/50 border border-[#dcebea]/60 rounded-xl text-slate-800 placeholder-slate-500 focus:ring-2 focus:ring-[#8dbbb9] transition-all"
               />
             </div>
-
-            {/* Clear Search */}
             <button
-              onClick={() => setSearchTerm('')}
-              className="flex items-center justify-center px-4 py-3 bg-slate-600 text-white rounded-xl hover:bg-slate-700 transition-all duration-200 transform hover:scale-105"
+              onClick={() => setSearchTerm("")}
+              className="flex items-center justify-center px-4 py-3 bg-gradient-to-r from-[#669a9b] to-[#8dbbb9] text-white rounded-xl hover:shadow-lg transition-all"
             >
               <X className="h-4 w-4 mr-2" />
-              Clear Search
+              Clear
             </button>
           </div>
         </div>
 
         {/* Create Form */}
         {showCreateForm && (
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20 animate-slide-up">
+          <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-[#dcebea]/60">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 bg-gradient-to-r from-[#669a9b] to-[#8dbbb9] rounded-2xl flex items-center justify-center shadow-lg">
                   <Lightbulb className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-slate-800">Share Your Study Tip</h2>
+                <h2 className="text-2xl font-bold text-[#669a9b]">
+                  Share Your Study Tip
+                </h2>
               </div>
               <button
                 onClick={() => setShowCreateForm(false)}
-                className="p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-white/50 transition-all duration-200"
+                className="p-2 text-slate-500 hover:text-[#669a9b] transition-all"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -182,115 +177,124 @@ const UserTips: React.FC = () => {
 
             <form onSubmit={handleCreateTip} className="space-y-6">
               <div>
-                <label htmlFor="title" className="block text-sm font-semibold text-slate-700 mb-3">
+                <label className="block text-sm font-semibold text-slate-700 mb-3">
                   Tip Title
                 </label>
                 <input
                   type="text"
-                  id="title"
                   value={newTip.title}
-                  onChange={(e) => setNewTip({ ...newTip, title: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/50 backdrop-blur-sm border border-white/30 rounded-xl text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter a catchy title for your study tip"
+                  onChange={(e) =>
+                    setNewTip({ ...newTip, title: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-[#dcebea]/70 rounded-xl focus:ring-2 focus:ring-[#8dbbb9]"
+                  placeholder="Enter a catchy title"
                   required
                 />
-                <p className="text-sm text-slate-500 mt-2">Minimum 10 characters required</p>
               </div>
 
               <div>
-                <label htmlFor="content" className="block text-sm font-semibold text-slate-700 mb-3">
+                <label className="block text-sm font-semibold text-slate-700 mb-3">
                   Tip Content
                 </label>
                 <textarea
-                  id="content"
-                  rows={6}
+                  rows={5}
                   value={newTip.content}
-                  onChange={(e) => setNewTip({ ...newTip, content: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/50 backdrop-blur-sm border border-white/30 rounded-xl text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Share your study tip in detail. What makes it effective? How has it helped you?"
+                  onChange={(e) =>
+                    setNewTip({ ...newTip, content: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-[#dcebea]/70 rounded-xl focus:ring-2 focus:ring-[#8dbbb9]"
+                  placeholder="Describe your study strategy..."
                   required
                 />
-                <p className="text-sm text-slate-500 mt-2">Minimum 10 characters required</p>
               </div>
 
-              <div className="flex justify-end space-x-4 pt-4">
+              <div className="flex justify-end space-x-4">
                 <button
                   type="button"
                   onClick={() => setShowCreateForm(false)}
-                  className="px-6 py-3 text-slate-600 bg-white/50 backdrop-blur-sm border border-white/30 rounded-xl hover:bg-white/70 transition-all duration-200"
+                  className="px-6 py-3 text-[#669a9b] bg-[#dcebea] rounded-xl hover:shadow-md"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
+                  disabled={loading}
+                  className="px-6 py-3 bg-gradient-to-r from-[#669a9b] to-[#8dbbb9] text-white rounded-xl hover:shadow-lg flex items-center space-x-2 disabled:opacity-50"
                 >
-                  <Send className="h-4 w-4" />
-                  <span>Submit Tip</span>
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4" />
+                      <span>Submit Tip</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>
           </div>
         )}
 
-        {/* Tips Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up delay-400">
-          {filteredTips.map((tip, index) => (
+        {/* Tips List */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {filteredTips.map((tip) => (
             <div
               key={tip.id}
               onClick={() => navigate(`/user/tips/${tip.id}`)}
-              className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 cursor-pointer group animate-slide-up"
-              style={{ animationDelay: `${index * 100 + 500}ms` }}
+              className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-md border border-[#dcebea]/60 hover:shadow-xl transition-all transform hover:-translate-y-2 hover:scale-105 cursor-pointer group"
             >
-              {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition-transform duration-300">
+                  <div className="w-12 h-12 bg-gradient-to-r from-[#669a9b] to-[#8dbbb9] rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300">
                     <Lightbulb className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <span className="text-amber-600 text-sm font-medium">Study Tip</span>
+                    <span className="text-[#669a9b] text-sm font-medium">
+                      Study Tip
+                    </span>
                     <div className="flex items-center space-x-2 text-slate-500 text-xs mt-1">
                       <Calendar className="h-3 w-3" />
-                      <span>{new Date(tip.createdAt).toLocaleDateString()}</span>
+                      <span>
+                        {new Date(tip.createdAt || "").toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
                 </div>
-                
-                {/* Status Badge */}
+
                 <div className="bg-green-100 border border-green-200 px-3 py-1 rounded-full flex items-center space-x-1">
                   <CheckCircle className="h-3 w-3 text-green-600" />
-                  <span className="text-xs font-medium text-green-700">Approved</span>
+                  <span className="text-xs font-medium text-green-700">
+                    Approved
+                  </span>
                 </div>
               </div>
 
-              {/* Content */}
               <div className="mb-4">
-                <h3 className="text-lg font-bold text-slate-800 mb-3 line-clamp-2 group-hover:text-amber-600 transition-colors duration-200">
+                <h3 className="text-lg font-bold text-[#669a9b] mb-3 line-clamp-2 group-hover:text-[#8dbbb9] transition-colors">
                   {tip.title}
                 </h3>
-                <p className="text-slate-600 text-sm leading-relaxed line-clamp-3">
+                <p className="text-slate-600 text-sm line-clamp-3">
                   {tip.content}
                 </p>
               </div>
 
-              {/* Footer */}
-              <div className="flex items-center justify-between pt-4 border-t border-white/30">
-                <div className="flex items-center space-x-4 text-slate-500 text-sm">
-                  <div className="flex items-center space-x-1">
-                    <User className="h-4 w-4" />
-                    <span className="font-medium">{tip.postedBy?.name || 'Anonymous'}</span>
-                  </div>
+              <div className="flex items-center justify-between pt-4 border-t border-[#dcebea]/60">
+                <div className="flex items-center space-x-2 text-slate-500 text-sm">
+                  <User className="h-4 w-4 text-[#8dbbb9]" />
+                  <span>{tip.postedBy?.name || "Anonymous"}</span>
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
-                  <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 transform hover:scale-110">
+                  <button className="p-2 text-slate-400 hover:text-[#669a9b] hover:bg-[#dcebea]/60 rounded-lg transition-all">
                     <Heart className="h-4 w-4" />
                   </button>
-                  <button className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all duration-200 transform hover:scale-110">
+                  <button className="p-2 text-slate-400 hover:text-[#669a9b] hover:bg-[#dcebea]/60 rounded-lg transition-all">
                     <BookmarkPlus className="h-4 w-4" />
                   </button>
-                  <button className="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-all duration-200 transform hover:scale-110">
+                  <button className="p-2 text-slate-400 hover:text-[#669a9b] hover:bg-[#dcebea]/60 rounded-lg transition-all">
                     <Eye className="h-4 w-4" />
                   </button>
                 </div>
@@ -299,74 +303,33 @@ const UserTips: React.FC = () => {
           ))}
         </div>
 
-        {/* Empty State */}
-        {filteredTips.length === 0 && (
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-12 shadow-xl border border-white/20 text-center animate-fade-in">
-            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Lightbulb className="h-10 w-10 text-amber-500" />
-            </div>
-            <h3 className="text-2xl font-bold text-slate-800 mb-3">No study tips found</h3>
-            <p className="text-slate-600 mb-6 max-w-md mx-auto leading-relaxed">
-              {searchTerm 
-                ? "Try adjusting your search terms or explore different keywords."
-                : "Be the first to share a valuable study tip with the community!"
-              }
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="inline-flex items-center px-6 py-3 bg-slate-600 text-white rounded-xl hover:bg-slate-700 transition-all duration-200 transform hover:scale-105"
-                >
-                  <X className="h-5 w-5 mr-2" />
-                  Clear Search
-                </button>
-              )}
-              <button
-                onClick={() => setShowCreateForm(true)}
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                Share Your First Tip
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Stats Section */}
         {filteredTips.length > 0 && (
-          <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 rounded-3xl p-8 text-white relative overflow-hidden animate-fade-in">
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 to-red-600/20"></div>
-            <div className="relative z-10">
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold mb-2">Community Impact</h3>
-                <p className="text-amber-100">See how our study tips are helping students succeed</p>
+          <div className="bg-gradient-to-r from-[#669a9b] via-[#8dbbb9] to-[#b9d6d5] rounded-3xl p-8 text-white mt-8 shadow-xl">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold mb-2">Community Impact</h3>
+              <p className="text-[#dcebea]">
+                See how NoteNexus tips are helping learners excel
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <Lightbulb className="h-8 w-8 mx-auto mb-2 text-white" />
+                <div className="text-3xl font-bold">{approvedTips.length}</div>
+                <p className="text-[#dcebea] text-sm">Total Tips</p>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Lightbulb className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="text-3xl font-bold mb-1">{tips.length}</div>
-                  <div className="text-amber-100 text-sm">Total Tips Shared</div>
-                </div>
-                
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <TrendingUp className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="text-3xl font-bold mb-1">95%</div>
-                  <div className="text-amber-100 text-sm">Success Rate</div>
-                </div>
-                
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Award className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="text-3xl font-bold mb-1">1K+</div>
-                  <div className="text-amber-100 text-sm">Students Helped</div>
-                </div>
+
+              <div className="text-center">
+                <TrendingUp className="h-8 w-8 mx-auto mb-2 text-white" />
+                <div className="text-3xl font-bold">95%</div>
+                <p className="text-[#dcebea] text-sm">Success Rate</p>
+              </div>
+
+              <div className="text-center">
+                <Award className="h-8 w-8 mx-auto mb-2 text-white" />
+                <div className="text-3xl font-bold">1K+</div>
+                <p className="text-[#dcebea] text-sm">Students Helped</p>
               </div>
             </div>
           </div>
