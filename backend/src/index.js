@@ -20,15 +20,8 @@ const PORT = 3000;
 
 app.use(express.json());
 app.use(
-  cors({
-    origin: [
-      "http://localhost:5173", // Local development (Vite frontend)
-      "https://your-production-frontend-domain.com" // optional: production build
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true, // only if you use cookies/auth headers
-  })
+  cors(
+  )
 );
 
 app.get("/", (req, res) => {
