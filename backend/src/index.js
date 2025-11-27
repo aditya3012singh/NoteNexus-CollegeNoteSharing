@@ -19,11 +19,17 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-app.use(cors({
-  origin: "https://notenexuskiet.netlify.app", // your frontend domain
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  credentials: true, // if you’re using cookies or tokens in headers
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // Local development (Vite frontend)
+      "https://your-production-frontend-domain.com" // optional: production build
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // only if you use cookies/auth headers
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("API running!");
