@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../redux/store";
-import { fetchRecentActivity } from "../../redux/slices/activitySlice";
+import { AppDispatch, RootState } from "../../../../my-project/src/redux/store";
+import { fetchRecentActivity } from "../../../../my-project/src/redux/slices/activitySlice";
 
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();

@@ -11,11 +11,11 @@ import {
   X,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../redux/store";
+import { AppDispatch, RootState } from "../../../../my-project/src/redux/store";
 import {
   getAllEvents,
   clearEventMessages,
-} from "../../redux/slices/eventSlice";
+} from "../../../../my-project/src/redux/slices/eventSlice";
 import { toast } from "react-toastify";
 
 const UserEvents: React.FC = () => {

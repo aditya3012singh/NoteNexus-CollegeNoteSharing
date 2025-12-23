@@ -10,49 +10,60 @@ import { logActivity } from "../utils/logActivity.js";
 const router = express.Router();
 const prisma = new PrismaClient();
 
-router.post("/note/upload", authMiddleware, s3Upload.single("file"), async (req, res) => {
-  try {
-    const { title, semester, subjectId, branches } = req.body;
+router.post(
+  "/note/upload",
+  authMiddleware,
+  s3Upload.single("file"),
+  async (req, res) => {
+    try {
+      const { title, semester, subjectId, branchCodes } = req.body;
 
-    if (!title || !branches || !semester || !subjectId || !req.file || !req.file.location) {
-      return res.status(400).json({ message: "Missing required fields or file" });
-    }
+      if (
+        !title ||
+        !branchCodes ||
+        !semester ||
+        !subjectId ||
+        !req.file?.location
+      ) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
 
-    const branchArray = JSON.parse(branches); // Expects branches to be a JSON stringified array from frontend
+      const branches = JSON.parse(branchCodes);
 
-    if (!Array.isArray(branchArray) || branchArray.length === 0) {
-      return res.status(400).json({ message: "Branches must be a non-empty array" });
-    }
+      if (!Array.isArray(branches) || branches.length === 0) {
+        return res.status(400).json({ message: "branchCodes must be array" });
+      }
 
-    const fileUrl = req.file.location;
-
-    // Upload once, then insert for each branch
-    const createdNotes = await Promise.all(
-      branchArray.map((branch) =>
-        prisma.note.create({
-          data: {
-            title,
-            branch,
-            semester: parseInt(semester),
-            subjectId,
-            fileUrl,
-            uploadedById: req.user.id,
+      const note = await prisma.note.create({
+        data: {
+          title,
+          semester: parseInt(semester),
+          subjectId,
+          fileUrl: req.file.location,
+          uploadedById: req.user.id,
+          branches: {
+            connect: branches.map((code) => ({ code })),
           },
-        })
-      )
-    );
+        },
+        include: {
+          branches: true,
+          subject: true,
+        },
+      });
 
-    await logActivity(req.user.id, 'Uploaded a note', title);
+      await logActivity(req.user.id, "Uploaded a note", title);
 
-    return res.status(201).json({
-      message: "Note uploaded successfully for all branches",
-      notes: createdNotes,
-    });
-  } catch (error) {
-    console.error("Upload error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+      return res.status(201).json({
+        message: "Note uploaded successfully",
+        note,
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
   }
-});
+);
+
 
 
 router.get("/note/debug", async (req, res) => {
@@ -68,22 +79,15 @@ router.get("/note/all", async (req,res)=>{
             where:{
                 approvedById:{not:null}//only approved ones
             },
-            include:{
-                subject:true,
-                uploadedBy:{
-                    select:{
-                        id:true,
-                        name:true,
-                        email:true
-                    }
-                },
-                approvedBy:{
-                    select:{
-                        id:true,
-                        name:true,
-                        email:true
-                    }
-                }
+            include: {
+              subject: true,
+              branches: true,
+              uploadedBy: {
+                select: { id: true, name: true, email: true },
+              },
+              approvedBy: {
+                select: { id: true, name: true, email: true },
+              },
             },
             orderBy:{
                 createdAt:"desc"
@@ -105,21 +109,14 @@ router.get("/note/:id", async (req,res)=>{
                 id:req.params.id
             },
             include:{
-                subject:true,
-                uploadedBy:{
-                    select:{
-                        id:true,
-                        name:true,
-                        email:true
-                    }
-                },
-                approvedBy:{
-                    select:{
-                        id:true,
-                        name:true,
-                        email:true
-                    }
-                },
+                  subject: true,
+                  branches: true,
+                  uploadedBy: {
+                    select: { id: true, name: true, email: true },
+                  },
+                  approvedBy: {
+                    select: { id: true, name: true, email: true },
+                  },
                 feedbacks:true
             }
         })
@@ -214,24 +211,27 @@ router.post('/bulk-delete', authMiddleware, isAdmin, async (req, res) => {
 
 // GET /note/filter?branch=IT&semester=4&subjectId=abc-uuid
 router.get("/note/filter", async (req, res) => {
-  const { branch, semester, subjectId } = req.query;
+  const { branchCode, semester, subjectId } = req.query;
 
   try {
     const notes = await prisma.note.findMany({
       where: {
-        ...(branch && { branch }),
-        ...(semester && { semester: parseInt(semester) }),
-        ...(subjectId && { subjectId }),
-        approvedById: { not: null }, // only approved
+        approvedById: { not: null },
+        ...(semester && { semester: parseInt(semester ) }),
+        ...(subjectId && { subjectId: subjectId }),
+        ...(branchCode && {
+          branches: {
+            some: { code: branchCode },
+          },
+        }),
       },
       include: {
         subject: true,
+        branches: true,
         uploadedBy: true,
         approvedBy: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
 
     return res.status(200).json({ notes });
@@ -241,13 +241,18 @@ router.get("/note/filter", async (req, res) => {
   }
 });
 
+
 router.get("/note/count", async (req, res) => {
   try {
     const count = await prisma.note.count({
-      where: {
-        approvedById: { not: null }, // ✅ Only approved notes
-      },
-    });
+  where: {
+    approvedById: { not: null },
+    branches: {
+      some: { id: req.user.branchId },
+    },
+  },
+});
+
     return res.status(200).json({ count });
   } catch (error) {
     console.error("Count fetch error:", error);

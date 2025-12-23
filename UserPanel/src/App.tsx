@@ -7,7 +7,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { RootState } from "./redux/store";
+import { RootState } from "../../my-project/src/redux/store";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

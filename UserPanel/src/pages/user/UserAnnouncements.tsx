@@ -14,11 +14,11 @@ import {
   Eye,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState, AppDispatch } from "../../redux/store";
+import type { RootState, AppDispatch } from "../../../../my-project/src/redux/store";
 import {
   getAllAnnouncements,
   clearMessages,
-} from "../../redux/slices/announcementSlice";
+} from "../../../../my-project/src/redux/slices/announcementSlice";
 import { toast } from "react-toastify";
 
 const UserAnnouncements: React.FC = () => {

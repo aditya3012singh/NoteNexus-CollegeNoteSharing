@@ -13,11 +13,11 @@ import {
   Key,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../redux/store";
+import { AppDispatch, RootState } from "../../../../my-project/src/redux/store";
 import {
   updateProfile,
   clearProfileState,
-} from "../../redux/slices/profileSlice";
+} from "../../../../my-project/src/redux/slices/profileSlice";
 import { toast } from "react-toastify";
 
 const UserProfile: React.FC = () => {

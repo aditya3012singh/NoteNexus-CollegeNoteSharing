@@ -9,13 +9,13 @@ import {
  
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../redux/store";
+import { AppDispatch, RootState } from "../../../../my-project/src/redux/store";
 import {
   getAllFiles,
   uploadFile,
   deleteFile,
   clearFileMessages,
-} from "../../redux/slices/fileSlice";
+} from "../../../../my-project/src/redux/slices/fileSlice";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 

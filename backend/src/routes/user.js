@@ -10,12 +10,16 @@ import { loginSchema, signupSchema, updateProfileSchema } from "../validators/Va
 import { error } from "console";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { isAdmin } from "../middlewares/isAdmin.js";
+import { connect } from "http2";
 
 dotenv.config();
 
 const router = express.Router();
 const prisma = new PrismaClient();
-const redis = new Redis(process.env.REDIS_URL);
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 redis.ping().then(console.log); // Should log 'PONG'
 
 
@@ -130,7 +134,14 @@ router.post("/signup", async (req, res) => {
       return res.status(403).json({ errors: parsed.error.errors });
     }
 
-    const { email: rawEmail, name, password, role } = parsed.data;
+    const { email: rawEmail, name, password, role, branchCode, semester } = parsed.data;
+    const branch = await prisma.branch.findUnique({
+      where: { code: branchCode },
+    });
+
+    if (!branch) {
+      return res.status(400).json({ message: "Invalid branch selected" });
+    }
     const email = rawEmail.toLowerCase(); // 🔥 Normalize email early
 
       // Use lowercased email consistently below
@@ -171,15 +182,24 @@ router.post("/signup", async (req, res) => {
         name,
         password: hashedPassword,
         role: role ?? "STUDENT",
+        semester,
+        branch:{
+          connect:{id:branch.id}
+        }
       },
     });
 
-    const token = jwt.sign({ 
-        id: user.id, 
-        role: user.role },
-        process.env.JWT_SECRET || "secret",
+    const token = jwt.sign(
+      {
+        id: user.id,
+        role: user.role,
+        branchId: user.branchId,
+        semester: user.semester,
+      },
+      process.env.JWT_SECRET || "secret",
       { expiresIn: "1h" }
     );
+
 
     await redis.del(`verified:${email}`);
 
@@ -190,6 +210,8 @@ router.post("/signup", async (req, res) => {
         email: user.email,
         name: user.name,
         role: user.role,
+        semester: user.semester,
+        branchId: user.branchId
       },
     });
   } catch (e) {
@@ -221,7 +243,12 @@ router.post("/signin", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id },
+      {
+        id: user.id,
+        role: user.role,
+        branchId: user.branchId,
+        semester: user.semester,
+      },
       process.env.JWT_SECRET || "secret",
       { expiresIn: "1h" }
     );
@@ -270,8 +297,23 @@ router.get("/me", authMiddleware, async (req, res) => {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, name: true, email: true, role: true, createdAt: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        semester: true,
+        branch: {
+          select: {
+            id: true,
+            code: true,
+            name: true,
+          },
+        },
+        createdAt: true,
+      },
     });
+
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -316,13 +358,35 @@ router.put("/update-profile", authMiddleware, async (req, res) => {
       return res.status(400).json({ errors: parsed.error.errors });
     }
 
-    const { name, password } = parsed.data;
+    const { name, password, semester } = parsed.data;
     const updateData = {};
 
     if (name) updateData.name = name;
+
     if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      updateData.password = hashedPassword;
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    if (semester) {
+      // 🔐 RULE: Student can only move forward by 1 semester
+      if (req.user.role === "STUDENT") {
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { semester: true },
+        });
+
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        if (semester !== user.semester + 1) {
+          return res.status(403).json({
+            message: "Students can only move to the next semester",
+          });
+        }
+      }
+
+      updateData.semester = semester;
     }
 
     const updatedUser = await prisma.user.update({
@@ -333,17 +397,38 @@ router.put("/update-profile", authMiddleware, async (req, res) => {
         name: true,
         email: true,
         role: true,
+        semester: true,
         createdAt: true,
       },
     });
 
-    res.status(200).json({ message: "Profile updated", user: updatedUser });
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
   } catch (error) {
     console.error("Error updating profile:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
+// GET /branch
+router.get("/branch", async (req, res) => {
+  try {
+    const branches = await prisma.branch.findMany({
+      select: {
+        id: true,
+        code: true,
+        name: true,
+      },
+      orderBy: { name: "asc" },
+    });
+
+    res.status(200).json({ branches });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch branches" });
+  }
+});
 
 export default router;
 

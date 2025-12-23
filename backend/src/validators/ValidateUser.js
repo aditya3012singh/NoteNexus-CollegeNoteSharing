@@ -4,7 +4,9 @@ export const signupSchema = z.object({
   email: z.string().email(),
   name: z.string().min(5, "Name must be at least 5 characters!!"),
   password: z.string().min(6, "Password must be at least 6 characters!!"),
-  role: z.enum(["ADMIN", "STUDENT"]).default("STUDENT")
+  role: z.enum(["ADMIN", "STUDENT"]).default("STUDENT"),
+  branchCode: z.string().min(1, "Branch is required"),
+  semester: z.number().min(1).max(8, "Semester must be between 1 and 8"),
 });
 
 
@@ -42,9 +44,10 @@ export const feedbackSchema = z.object({
 // by admin
 export const subjectSchema = z.object({
   name: z.string().min(1),
-  branch: z.string().min(1),
-  semester: z.number().min(1).max(8)
+  semester: z.number().int().min(1).max(8),
+  branchCodes: z.array(z.string()).min(1),
 });
+
 
 
 export const announcementSchema = z.object({//admin
@@ -94,4 +97,5 @@ export const deleteContentSchema = z.object({
 export const updateProfileSchema = z.object({
   name: z.string().min(1, "Name is required").optional(),
   password: z.string().min(6, "Password must be at least 6 characters").optional(),
+  semester: z.number().int().min(1).max(8).optional(),
 });

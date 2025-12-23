@@ -9,7 +9,7 @@ import { logActivity } from "../utils/logActivity.js"
 const prisma = new PrismaClient()
 const router=express.Router()
 
-router.post("/event", authMiddleware, isAdmin, async(req,res)=>{
+router.post("/", authMiddleware, isAdmin, async(req,res)=>{
     try{
         const parsed=eventSchema.safeParse(req.body)
         if(!parsed.success){

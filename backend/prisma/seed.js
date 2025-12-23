@@ -1,105 +1,128 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
+// async function main() {
+//   await prisma.branch.createMany({
+//     skipDuplicates: true,
+//     data: [
+//       { code: "CSE", name: "Computer Science Engineering" },
+//       { code: "IT", name: "Information Technology" },
+//       { code: "ECE", name: "Electronics & Communication Engineering" },
+//       { code: "ME", name: "Mechanical Engineering" },
+//       { code: "CSE_AI", name: "CSE Artificial Intelligence" },
+//       {code: "CSE_DS", name: "CSE Data Science" },
+//       {code: "CSE_CS", name: "CSE Cyber Security" },
+//       {code: "CSE_IAIML", name: "CSE Artificial Intelligence and Machine Learning" },
+//       {code:"CSIT", name: "Computer Science and Information Technology" },
+//       {code:"IT", name: "Information Technology" },
+//       {code:"CS", name: "Computer Science" },
+//     ],
+//   });
+//   console.log("Branches seeded.");
+// }
+
+// main()
+//   .then(() => prisma.$disconnect())
+//   .catch(async (e) => {
+//     console.error(e);
+//     await prisma.$disconnect();
+//     process.exit(1);
+//   });
+
+// async function upsertSubject(name, semester, branchCodes) {
+//   await prisma.subject.upsert({
+//     where: {
+//       name_semester: {
+//         name,
+//         semester,
+//       },
+//     },
+//     update: {},
+//     create: {
+//       name,
+//       semester,
+//       branches: {
+//         connect: branchCodes.map(code => ({ code })),
+//       },
+//     },
+//   });
+// }
+
+// async function main() {
+//   const SEM1_BRANCHES = ["CSE_AI", "CSE_IAIML", "CS"];
+
+//   /* ---------- SEMESTER 1 SUBJECTS (COMMON) ---------- */
+
+//   await upsertSubject("Calculus for Engineers", 1, SEM1_BRANCHES);
+//   await upsertSubject("Communication Skills", 1, SEM1_BRANCHES);
+//   await upsertSubject("Web Development", 1, SEM1_BRANCHES);
+//   await upsertSubject("IoT and Embedded Systems", 1, SEM1_BRANCHES);
+//   await upsertSubject("Design Thinking", 1, SEM1_BRANCHES);
+//   await upsertSubject("Programming for Problem Solving (PPS)", 1, SEM1_BRANCHES);
+//   await upsertSubject("Web Designing", 1, SEM1_BRANCHES);
+//   await upsertSubject("DSTL", 1, SEM1_BRANCHES);
+//   await upsertSubject("Semiconductor Physics and Devices", 1, SEM1_BRANCHES);
+
+//   console.log("✅ Semester 1 subjects seeded for CSE_AI, CSE_IAIML, CS");
+// }
+
+// main()
+//   .catch((e) => {
+//     console.error(e);
+//     process.exit(1);
+//   })
+//   .finally(async () => {
+//     await prisma.$disconnect();
+//   });
+
+
 async function main() {
-  // Create users
+  // 1️⃣ Find any existing branch (admin still needs branch + semester)
+  const branch = await prisma.branch.findFirst();
+
+  if (!branch) {
+    throw new Error("❌ No branch found. Please seed Branch first.");
+  }
+
+  // 2️⃣ Hash password
+  const hashedPassword = await bcrypt.hash("Admin@123", 10);
+
+  // 3️⃣ Create admin (skip if already exists)
+  const adminEmail = "admin@example.com";
+
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: adminEmail },
+  });
+
+  if (existingAdmin) {
+    console.log("⚠️ Admin already exists:", existingAdmin.email);
+    return;
+  }
+
   const admin = await prisma.user.create({
     data: {
-      name: 'Admin User',
-      email: 'admin@example.com',
-      password: 'adminpass',
-      role: 'ADMIN',
+      name: "Super Admin",
+      email: adminEmail,
+      password: hashedPassword,
+      role: "ADMIN",
+      semester: 0, // Admin doesn’t belong to a semester
+      branchId: branch.id,
     },
   });
 
-  const student = await prisma.user.create({
-    data: {
-      name: 'Student User',
-      email: 'student@example.com',
-      password: 'studentpass',
-      role: 'STUDENT',
-    },
+  console.log("✅ Admin created successfully:");
+  console.log({
+    email: admin.email,
+    role: admin.role,
   });
-
-  // Create subject
-  const subject = await prisma.subject.create({
-    data: {
-      name: 'Mathematics',
-      branch: 'CSE',
-      semester: 4,
-    },
-  });
-
-  // Create note
-  const note = await prisma.note.create({
-    data: {
-      title: 'Linear Algebra Notes',
-      branch: 'CSE',
-      semester: 4,
-      fileUrl: 'http://example.com/la.pdf',
-      subjectId: subject.id,
-      uploadedById: student.id,
-      approvedById: admin.id,
-    },
-  });
-
-  // Create tip
-  const tip = await prisma.tip.create({
-    data: {
-      title: 'Exam Prep',
-      content: 'Start early and solve previous papers.',
-      status: 'APPROVED',
-      postedById: student.id,
-      approvedById: admin.id,
-    },
-  });
-
-  // Create file
-  await prisma.file.create({
-    data: {
-      url: 'http://example.com/sample.pdf',
-      filename: 'sample.pdf',
-      type: 'pdf',
-      size: 123456,
-      uploadedById: student.id,
-    },
-  });
-
-  // Create feedback
-  await prisma.feedback.create({
-    data: {
-      content: 'This note is helpful!',
-      userId: student.id,
-      noteId: note.id,
-    },
-  });
-
-  // Create announcement
-  await prisma.announcement.create({
-    data: {
-      title: 'Welcome!',
-      message: 'The platform is now live.',
-      postedById: admin.id,
-    },
-  });
-
-  // Create event
-  await prisma.event.create({
-    data: {
-      title: 'Orientation Day',
-      content: 'Join us for the orientation session.',
-      eventDate: new Date('2025-07-01T10:00:00Z'),
-    },
-  });
-
-  console.log('🌱 Seed data inserted!');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("❌ Seeding error:", e);
     process.exit(1);
   })
-  .finally(() => {
-    prisma.$disconnect();
+  .finally(async () => {
+    await prisma.$disconnect();
   });

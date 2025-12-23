@@ -18,8 +18,8 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "../../redux/store";
-import { logout } from "../../redux/slices/authSlice";
+import type { AppDispatch, RootState } from "../../../../my-project/src/redux/store";
+import { logout } from "../../../../my-project/src/redux/slices/authSlice";
 
 /* ---------------------- Logo ---------------------- */
 const NoteNexusLogo: React.FC<{ className?: string; textSize?: string }> = ({

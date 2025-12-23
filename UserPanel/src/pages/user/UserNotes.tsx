@@ -11,13 +11,13 @@ import {
   User,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../redux/store";
+import { AppDispatch, RootState } from "../../../../my-project/src/redux/store";
 import { useNavigate } from "react-router-dom";
 import {
   getAllNotes,
   uploadNote,
   clearNoteState,
-} from "../../redux/slices/noteSlice";
+} from "../../../../my-project/src/redux/slices/noteSlice";
 import { toast } from "react-toastify";
 
 const UserNotes: React.FC = () => {

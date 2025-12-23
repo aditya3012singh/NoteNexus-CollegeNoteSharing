@@ -8,7 +8,7 @@ import { logActivity } from "../utils/logActivity.js"
 const prisma= new PrismaClient()
 const router= express.Router()
 
-router.post("/announcement", authMiddleware, isAdmin, async(req,res)=>{
+router.post("/", authMiddleware, isAdmin, async(req,res)=>{
     try{
         const parsed=announcementSchema.safeParse(req.body)
         if(!parsed.success){

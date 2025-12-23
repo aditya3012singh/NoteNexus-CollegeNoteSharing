@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../../../my-project/src/redux/store";
 import {
   checkAdminExists,
   checkUserExists,
@@ -20,7 +20,7 @@ import {
   verifyOtp,
   signUp,
   clearAuthError,
-} from "../../redux/slices/authSlice";
+} from "../../../../my-project/src/redux/slices/authSlice";
 
 /* ---------------------- Logo ---------------------- */
 const NoteNexusLogo: React.FC<{ className?: string; textSize?: string }> = ({

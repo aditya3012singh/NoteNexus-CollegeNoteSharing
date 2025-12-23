@@ -15,13 +15,18 @@ router.post("/subject", authMiddleware, isAdmin, async (req, res) => {
       return res.status(403).json({ errors: parsed.error.errors });
     }
 
-    const { name, branch, semester } = parsed.data;
+    const { name, semester, branchCodes } = parsed.data;
 
     const subject = await prisma.subject.create({
       data: {
         name,
-        branch,
-        semester: parseInt(semester),
+        semester,
+        branches: {
+          connect: branchCodes.map(code => ({ code })),
+        },
+      },
+      include: {
+        branches: true,
       },
     });
 
@@ -32,11 +37,15 @@ router.post("/subject", authMiddleware, isAdmin, async (req, res) => {
   }
 });
 
+
 // Get All Subjects
 router.get("/subject", async (req, res) => {
   try {
     const subjects = await prisma.subject.findMany({
       orderBy: { semester: "asc" },
+      include: {
+        branches: true,
+      },
     });
     res.status(200).json({ subjects });
   } catch (e) {
@@ -50,6 +59,9 @@ router.get("/subject/:id", async (req, res) => {
   try {
     const subject = await prisma.subject.findUnique({
       where: { id: req.params.id },
+      include: {
+        branches: true,
+      },
     });
 
     if (!subject) {
@@ -63,6 +75,7 @@ router.get("/subject/:id", async (req, res) => {
   }
 });
 
+
 // Update Subject by ID
 router.put("/subject/:id", authMiddleware, isAdmin, async (req, res) => {
   try {
@@ -71,23 +84,33 @@ router.put("/subject/:id", authMiddleware, isAdmin, async (req, res) => {
       return res.status(400).json({ errors: parsed.error.errors });
     }
 
-    const { name, branch, semester } = parsed.data;
+    const { name, semester, branchCodes } = parsed.data;
 
     const updatedSubject = await prisma.subject.update({
       where: { id: req.params.id },
       data: {
         name,
-        branch,
-        semester: parseInt(semester),
+        semester,
+        branches: {
+          set: [], // clear old branches
+          connect: branchCodes.map(code => ({ code })),
+        },
+      },
+      include: {
+        branches: true,
       },
     });
 
-    res.status(200).json({ message: "Subject updated", subject: updatedSubject });
+    res.status(200).json({
+      message: "Subject updated",
+      subject: updatedSubject,
+    });
   } catch (e) {
     console.error("Error updating subject:", e);
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 // Delete Subject by ID
 router.delete("/subject/:id", authMiddleware, isAdmin, async (req, res) => {
@@ -104,18 +127,23 @@ router.delete("/subject/:id", authMiddleware, isAdmin, async (req, res) => {
 
 // Optional: Filter Subjects by Branch & Semester
 router.get("/subject/filter", async (req, res) => {
-  const { branch, semester } = req.query;
+  const { branchCode, semester } = req.query;
 
   try {
-    const filteredSubjects = await prisma.subject.findMany({
+    const subjects = await prisma.subject.findMany({
       where: {
-        ...(branch && { branch }),
-        ...(semester && { semester: parseInt(semester) }),
+        ...(semester && { semester: parseInt(semester ) }),
+        ...(branchCode && {
+          branches: {
+            some: { code: branchCode  },
+          },
+        }),
       },
       orderBy: { semester: "asc" },
+      include: { branches: true },
     });
 
-    res.status(200).json({ subjects: filteredSubjects });
+    res.status(200).json({ subjects });
   } catch (e) {
     console.error("Error filtering subjects:", e);
     res.status(500).json({ message: "Internal server error" });

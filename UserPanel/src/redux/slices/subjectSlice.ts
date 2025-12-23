@@ -1,5 +1,6 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axiosInstance from '../../lib/axios';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import axiosInstance from '../../../../UserPanel/src/lib/axios';
 
 /* ---------------------- TYPES ---------------------- */
 export interface Subject {

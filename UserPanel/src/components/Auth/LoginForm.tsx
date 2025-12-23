@@ -10,8 +10,8 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import type { AppDispatch, RootState } from "../../redux/store";
-import { signIn, clearAuthError } from "../../redux/slices/authSlice";
+import type { AppDispatch, RootState } from "../../../../my-project/src/redux/store";
+import { signIn, clearAuthError } from "../../../../my-project/src/redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 /* ---------------------- Logo Component ---------------------- */
