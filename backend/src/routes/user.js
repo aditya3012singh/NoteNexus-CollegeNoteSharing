@@ -5,13 +5,13 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import { PrismaClient } from '@prisma/client';
-import Redis from "ioredis";
+
 import { loginSchema, signupSchema, updateProfileSchema } from "../validators/ValidateUser.js";
 import { error } from "console";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { isAdmin } from "../middlewares/isAdmin.js";
 import { connect } from "http2";
-
+import { Redis } from "@upstash/redis";
 dotenv.config();
 
 const router = express.Router();
