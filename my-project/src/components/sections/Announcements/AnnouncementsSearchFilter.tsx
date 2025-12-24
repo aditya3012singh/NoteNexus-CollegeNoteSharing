@@ -1,5 +1,12 @@
 import React from "react";
 import { Search, X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 
 type Props = {
   searchTerm: string;
@@ -37,15 +44,42 @@ export const AnnouncementsSearchFilter: React.FC<Props> = ({
           />
         </div>
 
-        <select
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value as any)}
-          className="px-4 py-3 bg-white border border-[#dcebea]/70 rounded-xl text-[#62afab] font-semibold focus:ring-2 focus:ring-[#8dbbb9] transition-all"
+      <Select
+        value={filterType}
+        onValueChange={(value) => setFilterType(value as any)}
+      >
+        <SelectTrigger
+          className="
+            w-full
+            py-6
+            bg-white/5
+            border border-white/15
+            rounded-xl
+            text-white
+            font-medium
+            focus:ring-2 focus:ring-[#8dbbb9]/40
+            transition
+          "
         >
-          <option value="all">All Announcements</option>
-          <option value="recent">Recent (This Week)</option>
-          <option value="important">Important Only</option>
-        </select>
+          <SelectValue placeholder="All Announcements" />
+        </SelectTrigger>
+
+        <SelectContent
+          className="
+            bg-[#0b0f0f]
+            text-white
+            border border-white/10
+            rounded-xl
+            shadow-xl
+          "
+        >
+          <SelectItem value="all">All Announcements</SelectItem>
+          <SelectItem value="recent">Recent (This Week)</SelectItem>
+          <SelectItem value="important">Important Only</SelectItem>
+        </SelectContent>
+      </Select>
+
+
 
         <button
           onClick={() => {

@@ -35,7 +35,7 @@ router.post("/", authMiddleware, isAdmin, async(req,res)=>{
 
 router.get("/announcement", async(req,res)=>{
     try{
-        const announcements= await prisma.announcement.findMany({
+        const announcements= await prisma.announcement.findMany({ 
             include:{
                 postedBy:{
                     select:{

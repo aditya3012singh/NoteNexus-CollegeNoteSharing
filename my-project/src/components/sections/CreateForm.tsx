@@ -341,7 +341,7 @@ export const CreateForm: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[rgba(26,65,158,1)] text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 shadow-lg shadow-[#669a9b]/25 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-60"
+            className="w-full bg-[#4e8c8d] text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 shadow-lg shadow-[#669a9b]/25 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-60"
           >
             {loading ? (
               <>

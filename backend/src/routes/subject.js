@@ -7,12 +7,12 @@ import { subjectSchema } from "../validators/ValidateUser.js";
 const prisma = new PrismaClient();
 const router = express.Router();
 
-// Create Subject
+/* ================= CREATE SUBJECT ================= */
 router.post("/subject", authMiddleware, isAdmin, async (req, res) => {
   try {
     const parsed = subjectSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(403).json({ errors: parsed.error.errors });
+      return res.status(400).json({ errors: parsed.error.errors });
     }
 
     const { name, semester, branchCodes } = parsed.data;
@@ -22,61 +22,75 @@ router.post("/subject", authMiddleware, isAdmin, async (req, res) => {
         name,
         semester,
         branches: {
-          connect: branchCodes.map(code => ({ code })),
+          connect: branchCodes.map((code) => ({ code })),
         },
       },
-      include: {
-        branches: true,
-      },
+      include: { branches: true },
     });
 
-    res.status(201).json({ message: "Subject created", subject });
+    res.status(201).json({ subject });
   } catch (e) {
-    console.error("Error creating subject:", e);
+    console.error(e);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
-
-// Get All Subjects
+/* ================= GET SUBJECTS (WITH FILTER) ================= */
+/*
+  Supports:
+  /api/subject
+  /api/subject?semester=1
+  /api/subject?branch=CSE_AI
+  /api/subject?semester=1&branch=CSE_AI
+*/
 router.get("/subject", async (req, res) => {
   try {
+    const { semester, branch } = req.query;
+
     const subjects = await prisma.subject.findMany({
+      where: {
+        ...(semester && { semester: Number(semester) }),
+        ...(branch && {
+          branches: {
+            some: { code: branch },
+          },
+        }),
+      },
       orderBy: { semester: "asc" },
-      include: {
-        branches: true,
+      select: {
+        id: true,
+        name: true,
+        semester: true,
       },
     });
-    res.status(200).json({ subjects });
+
+    res.status(200).json(subjects);
   } catch (e) {
-    console.error("Error fetching subjects:", e);
+    console.error(e);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
-// Get Subject by ID
+/* ================= GET SUBJECT BY ID ================= */
 router.get("/subject/:id", async (req, res) => {
   try {
     const subject = await prisma.subject.findUnique({
       where: { id: req.params.id },
-      include: {
-        branches: true,
-      },
+      include: { branches: true },
     });
 
     if (!subject) {
       return res.status(404).json({ message: "Subject not found" });
     }
 
-    res.status(200).json({ subject });
+    res.status(200).json(subject);
   } catch (e) {
-    console.error("Error fetching subject:", e);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error(e);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
-
-// Update Subject by ID
+/* ================= UPDATE SUBJECT ================= */
 router.put("/subject/:id", authMiddleware, isAdmin, async (req, res) => {
   try {
     const parsed = subjectSchema.safeParse(req.body);
@@ -86,66 +100,36 @@ router.put("/subject/:id", authMiddleware, isAdmin, async (req, res) => {
 
     const { name, semester, branchCodes } = parsed.data;
 
-    const updatedSubject = await prisma.subject.update({
+    const subject = await prisma.subject.update({
       where: { id: req.params.id },
       data: {
         name,
         semester,
         branches: {
-          set: [], // clear old branches
-          connect: branchCodes.map(code => ({ code })),
+          set: [],
+          connect: branchCodes.map((code) => ({ code })),
         },
       },
-      include: {
-        branches: true,
-      },
+      include: { branches: true },
     });
 
-    res.status(200).json({
-      message: "Subject updated",
-      subject: updatedSubject,
-    });
+    res.status(200).json(subject);
   } catch (e) {
-    console.error("Error updating subject:", e);
+    console.error(e);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
-
-// Delete Subject by ID
+/* ================= DELETE SUBJECT ================= */
 router.delete("/subject/:id", authMiddleware, isAdmin, async (req, res) => {
   try {
     await prisma.subject.delete({
       where: { id: req.params.id },
     });
+
     res.status(200).json({ message: "Subject deleted" });
   } catch (e) {
-    console.error("Error deleting subject:", e);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-// Optional: Filter Subjects by Branch & Semester
-router.get("/subject/filter", async (req, res) => {
-  const { branchCode, semester } = req.query;
-
-  try {
-    const subjects = await prisma.subject.findMany({
-      where: {
-        ...(semester && { semester: parseInt(semester ) }),
-        ...(branchCode && {
-          branches: {
-            some: { code: branchCode  },
-          },
-        }),
-      },
-      orderBy: { semester: "asc" },
-      include: { branches: true },
-    });
-
-    res.status(200).json({ subjects });
-  } catch (e) {
-    console.error("Error filtering subjects:", e);
+    console.error(e);
     res.status(500).json({ message: "Internal server error" });
   }
 });

@@ -11,6 +11,8 @@ import notesReducer from './slices/noteSlice';
 import profileReducer from './slices/profileSlice'; // ✅ make sure you have this file
 import activityReducer from './slices/activitySlice'
 import currPageReducer from './slices/currPageSlice';
+import userNotesReducer from "./slices/userNotesSlice";
+
 // ----------------------
 // Configure Store
 // ----------------------
@@ -27,6 +29,7 @@ export const store = configureStore({
     feedback: feedbackReducer,
     activity: activityReducer,
     currPage: currPageReducer,
+    userNotes: userNotesReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

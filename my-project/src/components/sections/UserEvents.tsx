@@ -17,7 +17,13 @@ import {
   clearEventMessages,
 } from "../../../../my-project/src/redux/slices/eventSlice";
 import { toast } from "react-toastify";
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
 const UserEvents: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { events, loading, error } = useSelector(
@@ -190,17 +196,42 @@ const UserEvents: React.FC = () => {
               />
             </div>
 
-            <select
-              value={filterType}
-              onChange={(e) =>
-                setFilterType(e.target.value as "all" | "upcoming" | "past")
-              }
-              className="px-4 py-3 bg-transparent border border-[#dcebea]/70 rounded-xl text-slate-200 focus:ring-2 focus:ring-[#8dbbb9] transition-all"
-            >
-              <option value="all">All Events</option>
-              <option value="upcoming">Upcoming</option>
-              <option value="past">Past</option>
-            </select>
+<Select
+  value={filterType}
+  onValueChange={(value) =>
+    setFilterType(value as "all" | "upcoming" | "past")
+  }
+>
+  <SelectTrigger
+    className="
+      w-full
+      py-6
+      bg-white/5
+      border border-white/15
+      rounded-xl
+      text-white
+      font-medium
+      focus:ring-2 focus:ring-[#8dbbb9]/40
+      transition
+    "
+  >
+    <SelectValue placeholder="All Events" />
+  </SelectTrigger>
+
+  <SelectContent
+    className="
+      bg-[#0b0f0f]
+      text-white
+      border border-white/10
+      rounded-xl
+      shadow-xl
+    "
+  >
+    <SelectItem value="all">All Events</SelectItem>
+    <SelectItem value="upcoming">Upcoming</SelectItem>
+    <SelectItem value="past">Past</SelectItem>
+  </SelectContent>
+</Select>
 
             <button
               onClick={() => {

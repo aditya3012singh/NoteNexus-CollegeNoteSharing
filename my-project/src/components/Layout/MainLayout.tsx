@@ -26,7 +26,8 @@ export const MainLayout: React.FC = () => {
         <LeftSideBar />
 
         {/* Main content */}
-        <main className="flex-1 p-4 md:p-6 pt-4 pb-28 md:pb-0">
+        <main className="flex-1 p-4 md:p-6 pt-20 md:pt-4 pb-28 md:pb-0">
+
           <Outlet />
         </main>
       </div>

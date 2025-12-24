@@ -43,7 +43,7 @@ export const LoginForm: React.FC = () => {
     }
 
     return (
-        <div className="bg-transparent rounded-2xl p-8 shadow-xl border border-[#dcebea]/50">
+        <div className="bg-transparent rounded-2xl p-8 shadow-xl border border-[#dcebea]/10">
           <form className="space-y-5" onSubmit={handleSubmit}>
             {/* Email */}
             <div>
@@ -63,7 +63,7 @@ export const LoginForm: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="aditya3012singh@gmail.com"
-                  className="w-full pl-11 pr-4 py-3 border-2 border-slate-200 rounded-xl bg-transparent text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-transparent focus:text-white focus:border-[#669a9b] transition-all duration-200"
+                  className="w-full pl-11 pr-4 py-3 border-2 border-white/10 rounded-xl bg-transparent text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-transparent focus:text-white focus:border-[#669a9b] transition-all duration-200"
                 />
               </div>
             </div>
@@ -86,7 +86,7 @@ export const LoginForm: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="234567"
-                  className="w-full pl-11 pr-12 py-3 border-2 border-slate-200 rounded-xl bg-transparent text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-transparent focus:text-white focus:border-[#8dbbb9] transition-all duration-200"
+                  className="w-full pl-11 pr-12 py-3 border-2 border-white/10 rounded-xl bg-transparent text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-transparent focus:text-white focus:border-[#8dbbb9] transition-all duration-200"
                 />
                 <button
                   type="button"
@@ -113,7 +113,7 @@ export const LoginForm: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[rgba(26,65,158,1)] text-white py-3.5 rounded-xl font-semibold shadow-lg shadow-[#669a9b]/25 hover:shadow-xl hover:shadow-[#669a9b]/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-[#4e8c8d] text-white py-3.5 rounded-xl font-semibold shadow-lg shadow-[#669a9b]/25 hover:shadow-xl hover:shadow-[#669a9b]/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -144,7 +144,7 @@ export const LoginForm: React.FC = () => {
           {/* Signup */}
           <Link
             to="/signup"
-            className="block w-full text-center py-3 border-2 border-[#669a9b] text-[#669a9b] rounded-xl font-semibold hover:bg-[rgba(26,65,158,1)] hover:text-white transition-all duration-200"
+            className="block w-full text-center py-3 border-2 border-[#669a9b] text-[#669a9b] rounded-xl font-semibold hover:bg-[#4e8c8d] hover:text-white transition-all duration-200"
           >
             Create an account
           </Link>

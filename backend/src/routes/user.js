@@ -197,7 +197,7 @@ router.post("/signup", async (req, res) => {
         semester: user.semester,
       },
       process.env.JWT_SECRET || "secret",
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
 
 
@@ -250,7 +250,7 @@ router.post("/signin", async (req, res) => {
         semester: user.semester,
       },
       process.env.JWT_SECRET || "secret",
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
 
     // Return user without password
