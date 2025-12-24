@@ -413,22 +413,7 @@ router.put("/update-profile", authMiddleware, async (req, res) => {
 });
 
 // GET /branch
-router.get("/branch", async (req, res) => {
-  try {
-    const branches = await prisma.branch.findMany({
-      select: {
-        id: true,
-        code: true,
-        name: true,
-      },
-      orderBy: { name: "asc" },
-    });
 
-    res.status(200).json({ branches });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch branches" });
-  }
-});
 
 export default router;
 

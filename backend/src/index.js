@@ -13,6 +13,7 @@ import overviewRoutes from './routes/overview.js'
 import contact from './routes/contact.js'
 import activityRoutes from './routes/activity.js'
 import fileRouter from './routes/file.js'
+import branchRouter from './routes/branch.js'
 dotenv.config();
 
 const app = express();
@@ -43,6 +44,7 @@ app.use("/api/v1/tips", tipRouter);
 app.use("/api/v1/feedback", feedbackRouter);
 app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/announcements", announcementRouter);
+app.use("/api/v1/branches", branchRouter);
 
 console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
