@@ -6,10 +6,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { fetchBranches } from "../../redux/slices/userNotesSlice";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+
 
 export const CreateForm: React.FC = () => {
     const dispatch= useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const { branches, loadingBranches } = useSelector(
+  (state: RootState) => state.userNotes
+);
+useEffect(() => {
+  dispatch(fetchBranches());
+}, [dispatch]);
 
     const {
         loading,
@@ -156,7 +165,7 @@ export const CreateForm: React.FC = () => {
             <button
               type="submit"
               disabled={loading || otp.length !== 6}
-              className="w-full bg-[rgba(26,65,158,1)] text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 shadow-lg shadow-[#669a9b]/25 hover:shadow-xl hover:-translate-y-0.5 transition disabled:opacity-60"
+              className="w-full bg-[#669a9b] text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 shadow-lg shadow-[#669a9b]/25 hover:shadow-xl hover:-translate-y-0.5 transition disabled:opacity-60"
             >
               {loading ? (
                 <>
@@ -275,15 +284,57 @@ export const CreateForm: React.FC = () => {
             <label className="block text-sm font-semibold text-white mb-2">
               Branch Code
             </label>
-            <input
-              name="branchCode"
-              type="text"
-              required
-              value={formData.branchCode}
-              onChange={handleInputChange}
-              placeholder="CSE, ECE, ME, etc."
-              className="w-full px-4 py-3 border-2 border-white/20 rounded-xl bg-transparent text-white placeholder-white/60 focus:border-white focus:outline-none"
-            />
+                    <div>
+        
+
+              <Select
+                value={formData.branchCode || ""}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, branchCode: value }))
+                }
+                disabled={loadingBranches}
+              >
+                <SelectTrigger
+                  className="
+                    w-full
+                    px-3 py-6
+                    border-2 border-white/10
+                    rounded-xl
+                    bg-transparent
+                    text-white
+                    focus:border-white
+                    transition
+                  "
+                >
+                  <SelectValue
+                    placeholder={
+                      loadingBranches ? "Loading branches..." : "Select branch"
+                    }
+                  />
+                </SelectTrigger>
+
+                <SelectContent
+                  className="
+                    bg-[#0b0f0f]
+                    text-white
+                    border border-white/10
+                    rounded-xl
+                    shadow-xl
+                    max-h-60
+                    max-w-80 md:max-w-100
+                    overflow-y-auto
+                  "
+                >
+                  {branches.map((branch) => (
+                    <SelectItem key={branch.id} value={branch.code}>
+                      {branch.name} ({branch.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+        </div>
+
           </div>
           {/* Password */}
           <div>
