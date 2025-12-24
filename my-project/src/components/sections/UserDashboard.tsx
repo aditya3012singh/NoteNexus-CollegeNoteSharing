@@ -131,15 +131,15 @@ const UserDashboard: React.FC = () => {
             <div>
               <h1 className="text-4xl font-bold text-white mb-4">
                 Welcome back,{" "}
-                <span className="text-[#669a9b]">{user?.name || "Learner"}</span> 👋
+                <span className="text-[#74d1d3]">{user?.name || "Learner"}</span> 👋
               </h1>
-              <p className="text-lg text-slate-600">
+              <p className="text-lg text-slate-200">
                 Continue your learning journey with{" "}
-                <span className="font-semibold text-[#669a9b]">NoteNexus</span>.
+                <span className="font-semibold text-[#70c4c5]">NoteNexus</span>.
               </p>
               <div className="flex items-center mt-4 space-x-2">
-                <div className="w-3 h-3 bg-[#669a9b] rounded-full animate-pulse"></div>
-                <span className="text-sm text-slate-500 font-medium">
+                <div className="w-3 h-3 bg-[#9ee7b7] rounded-full animate-pulse"></div>
+                <span className="text-sm text-slate-300 font-medium">
                   All systems ready for learning
                 </span>
               </div>
@@ -176,10 +176,10 @@ const UserDashboard: React.FC = () => {
                   </div>
                   <ChevronRight className="h-5 w-5 text-slate-400" />
                 </div>
-                <p className="text-sm font-medium text-slate-600 mb-1">
+                <p className="text-sm font-medium text-slate-300 mb-1">
                   {stat.name}
                 </p>
-                <p className="text-3xl font-bold text-slate-800">{stat.value}</p>
+                <p className="text-3xl font-bold text-slate-400">{stat.value}</p>
               </div>
             );
           })}
@@ -221,16 +221,16 @@ const UserDashboard: React.FC = () => {
                 {activities.slice(0, 5).map((activity) => (
                   <div
                     key={activity.id}
-                    className="flex items-center space-x-4 p-4 rounded-xl hover:bg-[#dcebea]/40 border border-[#dcebea]/50 transition"
+                    className="flex items-center space-x-4 p-4 rounded-xl hover:bg-[#dcebea]/3 border border-[#dcebea]/5 transition"
                   >
                     <div className="w-10 h-10 bg-gradient-to-tr from-[#669a9b] to-[#8dbbb9] rounded-lg flex items-center justify-center">
                       <Clock className="h-5 w-5 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-slate-800 truncate">
+                      <p className="font-medium text-slate-200 truncate">
                         {activity.action}
                       </p>
-                      <p className="text-xs text-slate-500 mt-1">
+                      <p className="text-xs text-slate-200 mt-1">
                         {new Date(activity.time).toLocaleString()}
                       </p>
                     </div>
@@ -257,7 +257,7 @@ const UserDashboard: React.FC = () => {
                   <button
                     key={action.name}
                     onClick={() => navigate(action.href)}
-                    className="w-full flex items-center justify-between p-4 rounded-xl border border-[#dcebea]/10 hover:bg-[#dcebea]/40 transition"
+                    className="w-full flex items-center justify-between p-4 rounded-xl border border-[#dcebea]/4 hover:bg-[#dcebea]/40 transition"
                   >
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-[#dcebea] rounded-lg flex items-center justify-center">
