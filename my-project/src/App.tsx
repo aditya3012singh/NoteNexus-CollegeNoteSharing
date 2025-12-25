@@ -7,7 +7,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { Auth } from './components/pages/Auth';
 import { Styling } from './components/pages/Styling';
-import { Home } from './components/pages/Home';
 import MainLayout from './components/Layout/MainLayout';
 import { Dashboard } from './components/pages/UserDashboard';
 import Notes from './components/pages/Notes';

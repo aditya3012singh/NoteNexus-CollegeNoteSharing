@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(
   cors(
     {
-      origin: "https://notesnexuskiet.netlify.app",
+      origin: "http://localhost:5173",
       methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: true,
     }

@@ -8,7 +8,6 @@ import {
   FileText,
   Calendar,
   Star,
-  Eye,
   Share2,
   AlertCircle,
   File,

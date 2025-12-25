@@ -1,4 +1,4 @@
-import React from 'react';
+
 import UserEvents from '../sections/UserEvents';
 
 export function Events() {

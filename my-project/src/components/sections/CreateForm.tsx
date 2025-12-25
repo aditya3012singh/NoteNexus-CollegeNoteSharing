@@ -59,16 +59,16 @@ useEffect(() => {
             setFormData((prev) => ({ ...prev,  [name]: name === "semester" ? Number(value) : value,}));
             if (error) dispatch(clearAuthError());
         };
-        const handleRoleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-            const value = e.target.value as "STUDENT" | "ADMIN";
-            setFormData((prev) => ({ ...prev, role: value }));
-            if (value === "ADMIN") {
-            const result = await dispatch(checkAdminExists()).unwrap().catch(() => null);
-            if (result?.adminExists) {
-                toast.error("An admin already exists. Only one admin is allowed.");
-                    }
-                }
-            };
+        // const handleRoleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        //     const value = e.target.value as "STUDENT" | "ADMIN";
+        //     setFormData((prev) => ({ ...prev, role: value }));
+        //     if (value === "ADMIN") {
+        //     const result = await dispatch(checkAdminExists()).unwrap().catch(() => null);
+        //     if (result?.adminExists) {
+        //         toast.error("An admin already exists. Only one admin is allowed.");
+        //             }
+        //         }
+        //     };
     const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -142,7 +142,7 @@ useEffect(() => {
 
     if (step === "otp") {
     return (
-      <div className="max-w-md w-full space-y-6 relative z-10 text-white">
+      <div className="max-w-sm w-full space-y-6 relative z-10 text-white">
 
           <form
             onSubmit={handleOtpVerification}
@@ -207,7 +207,7 @@ useEffect(() => {
     );
   }
     return (
-      <div className="max-w-md w-full space-y-6 relative z-10 text-white">
+      <div className="max-w-md w-full space-y-6 relative z-10 bg-black pb-10 md:pb-0 text-white">
         <form
           onSubmit={handleSignup}
           className="bg-transparent p-8 rounded-2xl shadow-none border border-white/10 space-y-6 text-white"

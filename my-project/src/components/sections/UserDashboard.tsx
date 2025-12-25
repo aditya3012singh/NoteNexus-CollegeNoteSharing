@@ -6,11 +6,9 @@ import {
   MessageSquare,
   Award,
   Clock,
-  Star,
   ChevronRight,
   Activity,
   Zap,
-  BarChart3,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";

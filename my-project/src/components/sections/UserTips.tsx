@@ -7,13 +7,7 @@ import {
   X,
   Send,
   User,
-  CheckCircle,
   Calendar,
-  Heart,
-  BookmarkPlus,
-  Eye,
-  Award,
-  TrendingUp,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

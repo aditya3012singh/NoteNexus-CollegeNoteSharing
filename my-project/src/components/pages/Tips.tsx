@@ -1,4 +1,4 @@
-import React from 'react';
+
 import UserTips from '../sections/UserTips';
 
 export function Tips() {

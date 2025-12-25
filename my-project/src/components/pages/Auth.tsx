@@ -23,8 +23,8 @@ export const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center">
-      <div className="w-full h-screen relative bg-black">
+    <div className="min-h-screen relative flex items-center bg-black pt-12  md:pt-4 justify-center">
+      <div className="w-full h-screen relative bg-">
         {/* Background */}
         <PixelSnow
           className="absolute inset-0 z-0"

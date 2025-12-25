@@ -1,4 +1,4 @@
-import React from 'react';
+
 import UserProfile from '../sections/UserProfile';
 
 export function Profile() {

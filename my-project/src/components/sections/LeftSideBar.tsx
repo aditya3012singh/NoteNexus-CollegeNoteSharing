@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/redux/store';
 import { setPage } from '../../redux/slices/currPageSlice';
 import { logout } from '../../redux/slices/authSlice';
-import { ArrowUp, Home, NotebookTabs, Lightbulb, Calendar, Megaphone, FileText, User, LogOut, Image } from 'lucide-react' 
+import { Home, NotebookTabs, Lightbulb, Calendar, Megaphone,  User, LogOut } from 'lucide-react' 
 // import Image from 'next/image'
-import React from 'react'
+
 import { useNavigate } from 'react-router-dom';
 
 function LeftSideBar() {
@@ -86,8 +86,9 @@ function LeftSideBar() {
                   >
                     Note
                     <span className="text-[#65e2e4] font-extrabold">Nexus</span>
+                    
                   </div>
-
+                    
 
 
                 <div className='rounded-full hidden md:flex   w-16 h-16'>

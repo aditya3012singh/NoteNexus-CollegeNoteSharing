@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, User, Clock, BookmarkPlus, Share2, Eye } from "lucide-react";
+import { Calendar, User, Clock, } from "lucide-react";
 import type { Announcement } from "../../../redux/slices/announcementSlice";
 import { getAnnouncementPriority, formatDate } from "./utils";
 

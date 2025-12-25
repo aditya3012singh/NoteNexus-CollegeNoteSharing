@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   User,
   Mail,
   Shield,
   Edit,
-  Save,
   X,
   Star,
-  Award,
   Clock,
   CheckCircle,
   Key,
@@ -21,8 +21,11 @@ import {
 } from "../../redux/slices/profileSlice";
 import { toast } from "react-toastify";
 import UserProfileSkeleton from "./UserProfileSkeleton";
+import { logout } from "../../redux/slices/authSlice";
 
 const UserProfile: React.FC = () => {
+  const navigate = useNavigate();
+
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error, success } = useSelector(
     (state: RootState) => state.profile
@@ -153,23 +156,66 @@ const UserProfile: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               {!isEditing && !showPasswordForm && (
                 <>
                   <button
                     onClick={() => setShowPasswordForm(true)}
-                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#669a9b] to-[#8dbbb9] text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all"
+                    className="
+                      inline-flex items-center
+                      px-4 py-3
+                      md:px-6 md:py-3
+                      bg-gradient-to-r from-[#669a9b] to-[#8dbbb9]
+                      text-white font-semibold
+                      rounded-xl
+                      shadow-md
+                      hover:shadow-lg
+                      transition-all
+                    "
                   >
-                    <Key className="h-5 w-5 mr-2" />
-                    Change Password
+                    <Key className="h-5 w-5 md:mr-2" />
+                    <span className="hidden md:inline">Change Password</span>
                   </button>
+
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#669a9b] to-[#8dbbb9] text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all"
+                    className="
+                      inline-flex items-center
+                      px-4 py-3
+                      md:px-6 md:py-3
+                      bg-gradient-to-r from-[#669a9b] to-[#8dbbb9]
+                      text-white font-semibold
+                      rounded-xl
+                      shadow-md
+                      hover:shadow-lg
+                      transition-all
+                    "
                   >
-                    <Edit className="h-5 w-5 mr-2" />
-                    Edit Profile
+                    <Edit className="h-5 w-5 md:mr-2" />
+                    <span className="hidden md:inline">Edit Profile</span>
                   </button>
+
+                  <button
+                    onClick={() => {
+                      dispatch(logout());
+                      navigate("/login");
+                    }}
+                    className="
+                      inline-flex items-center
+                      px-4 py-3
+                      md:px-6 md:py-3
+                      border border-red-400/40
+                      text-red-400 font-semibold
+                      rounded-xl
+                      hover:bg-red-500/10
+                      transition-all
+                    "
+                  >
+                    <X className="h-5 w-5 md:mr-2" />
+                    <span className="hidden md:inline">Logout</span>
+                  </button>
+
+
                 </>
               )}
             </div>

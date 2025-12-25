@@ -18,7 +18,6 @@ import {
   Award,
   AlertCircle,
   ArrowLeft,
-  MessageCircle,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
