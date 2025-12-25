@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-const API = "http://localhost:3000/api/v1";
+const API = "https://autonomous-kiet-hub.onrender.com/api/v1";
 
 /* ================= TYPES ================= */
 
@@ -58,7 +58,7 @@ const initialState: UserNotesState = {
 export const fetchBranches = createAsyncThunk(
   "userNotes/fetchBranches",
   async () => {
-    const res = await fetch(`${API}/users/branch`);
+    const res = await fetch(`${API}/branches`);
     const data = await res.json();
     return data.branches; // IMPORTANT
   }
